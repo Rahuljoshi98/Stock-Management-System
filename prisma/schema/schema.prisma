@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id            String               @id @default(uuid()) @db.Uuid
+  name          String
+  email         String?
+  phone_no      String?
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  country       String?
+  logo          String?
+  status        OrganizationStatus   @default(ACTIVE)
+  members       OrganizationMember[]
+  created_by_id String               @db.Uuid
+  created_by    User                 @relation("OrganizationCreator", fields: [created_by_id], references: [id])
+  created_at    DateTime             @default(now())
+  updated_at    DateTime             @updatedAt
+  deleted_at    DateTime?
+
+  @@map("organizations")
+}
+
+model User {
+  id                   String               @id @default(uuid()) @db.Uuid
+  email                String               @unique
+  password             String
+  first_name           String
+  last_name            String
+  phone_no             String?              @unique
+  profile_pic          String?
+  isVerified           Boolean              @default(false)
+  lastLoginAt          DateTime?
+  memberships          OrganizationMember[]
+  created_at           DateTime             @default(now())
+  updated_at           DateTime             @updatedAt
+  deleted_at           DateTime?
+  organization_created Organization[]       @relation("OrganizationCreator")
+
+  @@map("users")
+}
+
+model OrganizationMember {
+  id              String       @id @default(uuid()) @db.Uuid
+  organization_id String       @db.Uuid
+  user_id         String       @db.Uuid
+  role_id         String       @db.Uuid
+  status          MemberStatus @default(ACTIVE)
+  joinedAt        DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  user            User         @relation(fields: [user_id], references: [id])
+  role            Role         @relation(fields: [role_id], references: [id])
+
+  @@unique([organization_id, user_id])
+  @@index([organization_id])
+  @@index([user_id])
+  @@map("organization_members")
+}
+
+model Role {
+  id          String               @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  permissions Json
+  members     OrganizationMember[]
+  createdAt   DateTime             @default(now())
+
+  @@map("role")
+}

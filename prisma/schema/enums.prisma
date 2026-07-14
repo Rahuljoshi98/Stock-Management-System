@@ -1,0 +1,10 @@
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum MemberStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
