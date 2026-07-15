@@ -8,3 +8,10 @@ enum MemberStatus {
   INVITED
   SUSPENDED
 }
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}

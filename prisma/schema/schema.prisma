@@ -27,29 +27,36 @@ model Organization {
   status        OrganizationStatus   @default(ACTIVE)
   members       OrganizationMember[]
   created_by_id String               @db.Uuid
-  created_by    User                 @relation("OrganizationCreator", fields: [created_by_id], references: [id])
   created_at    DateTime             @default(now())
   updated_at    DateTime             @updatedAt
   deleted_at    DateTime?
+  invitations   Invitation[]
+
+  created_by User @relation("OrganizationCreator", fields: [created_by_id], references: [id])
 
   @@map("organizations")
 }
 
 model User {
-  id                   String               @id @default(uuid()) @db.Uuid
-  email                String               @unique
-  password             String
-  first_name           String
-  last_name            String
-  phone_no             String?              @unique
-  profile_pic          String?
-  is_verified          Boolean              @default(false)
-  last_login_at        DateTime?
-  memberships          OrganizationMember[]
-  created_at           DateTime             @default(now())
-  updated_at           DateTime             @updatedAt
-  deleted_at           DateTime?
-  organization_created Organization[]       @relation("OrganizationCreator")
+  id             String               @id @default(uuid()) @db.Uuid
+  email          String               @unique
+  password       String
+  first_name     String
+  last_name      String
+  phone_no       String?              @unique
+  profile_pic    String?
+  is_verified    Boolean              @default(false)
+  last_login_at  DateTime?
+  memberships    OrganizationMember[]
+  created_at     DateTime             @default(now())
+  updated_at     DateTime             @updatedAt
+  deleted_at     DateTime?
+  invitations    Invitation[]         @relation("InvitationSender")
+  member_invited OrganizationMember[] @relation("InvitationSender")
+
+  organization_created Organization[] @relation("OrganizationCreator")
+  roles_created        Role[]         @relation("RoleCreator")
+  roles_updated        Role[]         @relation("RoleUpdate")
 
   @@map("users")
 }
@@ -64,9 +71,13 @@ model OrganizationMember {
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   deleted_at      DateTime?
-  organization    Organization @relation(fields: [organization_id], references: [id])
-  user            User         @relation(fields: [user_id], references: [id])
-  role            Role         @relation(fields: [role_id], references: [id])
+
+  invited_by_id String @db.Uuid
+
+  invited_by   User         @relation("InvitationSender", fields: [invited_by_id], references: [id])
+  organization Organization @relation(fields: [organization_id], references: [id])
+  user         User         @relation(fields: [user_id], references: [id])
+  role         Role         @relation(fields: [role_id], references: [id])
 
   @@unique([organization_id, user_id])
   @@index([organization_id])
@@ -83,6 +94,33 @@ model Role {
   created_at  DateTime             @default(now())
   updated_at  DateTime             @updatedAt
   deleted_at  DateTime?
+  created_by  String               @db.Uuid
+  updated_by  String               @db.Uuid
+  invitations Invitation[]
+
+  created_by_user User @relation("RoleCreator", fields: [created_by], references: [id])
+  updated_by_user User @relation("RoleUpdate", fields: [updated_by], references: [id])
 
   @@map("role")
+}
+
+model Invitation {
+  id              String           @id @default(uuid())
+  email           String
+  organization_id String           @db.Uuid
+  role_id         String           @db.Uuid
+  token           String           @unique
+  expires_at      DateTime
+  status          InvitationStatus @default(PENDING)
+  invited_by_id   String           @db.Uuid
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organization_id], references: [id])
+  role         Role         @relation(fields: [role_id], references: [id])
+  invited_by   User         @relation("InvitationSender", fields: [invited_by_id], references: [id])
+
+  @@index([organization_id])
+  @@index([email])
+  @@map("invitation")
 }
