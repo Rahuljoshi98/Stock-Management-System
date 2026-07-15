@@ -34,8 +34,8 @@ CREATE TABLE "users" (
     "last_name" TEXT NOT NULL,
     "phone_no" TEXT,
     "profile_pic" TEXT,
-    "isVerified" BOOLEAN NOT NULL DEFAULT false,
-    "lastLoginAt" TIMESTAMP(3),
+    "is_verified" BOOLEAN NOT NULL DEFAULT false,
+    "last_login_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
@@ -50,9 +50,10 @@ CREATE TABLE "organization_members" (
     "user_id" UUID NOT NULL,
     "role_id" UUID NOT NULL,
     "status" "MemberStatus" NOT NULL DEFAULT 'ACTIVE',
-    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "joined_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "organization_members_pkey" PRIMARY KEY ("id")
 );
@@ -63,7 +64,9 @@ CREATE TABLE "role" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "permissions" JSONB NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "role_pkey" PRIMARY KEY ("id")
 );
