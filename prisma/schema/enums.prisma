@@ -15,3 +15,8 @@ enum InvitationStatus {
   EXPIRED
   REVOKED
 }
+
+enum AuditActorType {
+  USER
+  SYSTEM
+}

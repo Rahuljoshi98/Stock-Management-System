@@ -31,6 +31,7 @@ model Organization {
   updated_at    DateTime             @updatedAt
   deleted_at    DateTime?
   invitations   Invitation[]
+  roles         Role[]
 
   created_by User @relation("OrganizationCreator", fields: [created_by_id], references: [id])
 
@@ -86,17 +87,20 @@ model OrganizationMember {
 }
 
 model Role {
-  id          String               @id @default(uuid()) @db.Uuid
-  name        String
-  description String?
-  permissions Json
-  members     OrganizationMember[]
-  created_at  DateTime             @default(now())
-  updated_at  DateTime             @updatedAt
-  deleted_at  DateTime?
-  created_by  String               @db.Uuid
-  updated_by  String?              @db.Uuid
-  invitations Invitation[]
+  id              String               @id @default(uuid()) @db.Uuid
+  name            String
+  description     String?
+  permissions     Json
+  members         OrganizationMember[]
+  organization_id String               @db.Uuid
+  organization    Organization         @relation(fields: [organization_id], references: [id])
+  created_at      DateTime             @default(now())
+  updated_at      DateTime             @updatedAt
+  deleted_at      DateTime?
+  created_by_type AuditActorType       @default(USER)
+  created_by      String               @db.Uuid
+  updated_by      String?              @db.Uuid
+  invitations     Invitation[]
 
   created_by_user User  @relation("RoleCreator", fields: [created_by], references: [id])
   updated_by_user User? @relation("RoleUpdate", fields: [updated_by], references: [id])
